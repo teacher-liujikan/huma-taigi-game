@@ -61,6 +61,16 @@ button{font:inherit;cursor:pointer;border:none;border-radius:14px}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .next{display:none;margin:14px auto 0}
 .next.on{display:block}
+/* 句子填空 */
+.sent{background:var(--u4l);border-left:8px solid var(--u4);border-radius:12px;padding:18px 16px;margin:0 0 14px;text-align:center}
+.sent .s{font-size:26px;font-weight:800;line-height:1.6}
+.sent .blank{display:inline-block;min-width:2.2em;border-bottom:4px solid var(--u4);color:var(--u4);margin:0 4px}
+.sent .stl{font-size:16px;color:var(--grey);margin-top:6px;min-height:1.4em}
+.opts4 .opt{background:#FFF7F0;border-color:#EFCDB4}
+.opts4 .opt.ok{border-color:var(--good);background:#EAF6EA}
+.opts4 .opt.no{border-color:var(--bad);background:#FBEAEA}
+.say{margin:10px auto 0;display:none}
+.say.on{display:inline-block}
 /* 排序 */
 .slots{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;padding:10px;border:3px dashed var(--u2);border-radius:14px;background:var(--u2l);margin-bottom:12px}
 .slots .chip{background:#fff}
@@ -75,15 +85,6 @@ button{font:inherit;cursor:pointer;border:none;border-radius:14px}
 .two button{padding:18px 8px;font-size:21px;font-weight:800;color:#fff}
 .yes{background:var(--good)} .no-b{background:var(--bad)}
 .fb{min-height:52px;text-align:center;font-size:18px;margin-top:12px;line-height:1.5}
-/* 打地鼠 */
-.prompt{background:var(--u4l);border-left:8px solid var(--u4);padding:10px 14px;border-radius:10px;font-size:18px;margin-bottom:12px}
-.holes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.hole{aspect-ratio:1.2/1;border-radius:50% 50% 18px 18px/40% 40% 18px 18px;background:#8E6B47;position:relative;overflow:hidden;padding:0}
-.hole .mole{position:absolute;left:8%;right:8%;bottom:-100%;height:82%;border-radius:40px 40px 10px 10px;background:#F3D9B5;border:3px solid #6E4F31;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:bottom .15s;font-size:19px;font-weight:800;color:var(--tai)}
-.hole.up .mole{bottom:4%}
-.hole.hit-ok .mole{background:#CDEBC9}
-.hole.hit-no .mole{background:#F6C9C3}
-.big{font-size:22px;text-align:center;margin:14px 0 6px;font-weight:800}
 /* 聽發音 */
 details{margin-top:18px;background:var(--paper);border-radius:12px;padding:10px 14px}
 summary{cursor:pointer;font-weight:700;font-size:16px}
@@ -116,7 +117,7 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
     <a class="unit" href="#u1" style="background:var(--u1)"><div><b>單元一　認識胡麻</b><span>聽聽看，選選看</span><small>聽臺語，選出正確的詞</small></div></a>
     <a class="unit" href="#u2" style="background:var(--u2)"><div><b>單元二　胡麻成長</b><span>胡麻長大排排看</span><small>從種子排到結莢</small></div></a>
     <a class="unit" href="#u3" style="background:var(--u3)"><div><b>單元三　友善土地</b><span>友善土地分一分</span><small>是土地的好朋友嗎？</small></div></a>
-    <a class="unit" href="#u4" style="background:var(--u4)"><div><b>單元四　豐收感恩</b><span>收成臺語打地鼠</span><small>30 秒挑戰</small></div></a>
+    <a class="unit" href="#u4" style="background:var(--u4)"><div><b>單元四　豐收感恩</b><span>收成句子填填看</span><small>把臺語詞填進句子裡</small></div></a>
   </div>
   <p class="tip">學完哪個單元，就玩哪個單元的遊戲！</p>
 </section>
@@ -162,11 +163,16 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
 
 <section class="game" id="u4">
   <a class="back" href="#">← 回首頁</a>
-  <h2 style="color:var(--u4)">單元四　收成臺語打地鼠</h2>
-  <div class="prompt">打出<b>收成和感恩</b>時會說的臺語！打對加 1 分，打錯扣 1 分。</div>
-  <div class="bar"><span class="pill" id="u4-time">⏱ 30 秒</span><span class="pill" id="u4-score">⭐ 0 分</span><button class="btn" id="u4-go" onclick="U4.start()">開始</button></div>
-  <div class="holes" id="u4-holes"></div>
-  <div class="big" id="u4-end"></div>
+  <h2 style="color:var(--u4)">單元四　收成句子填填看</h2>
+  <p class="how">讀讀看句子，選出<b>空格裡的臺語詞</b>。答對了會念給你聽喔！</p>
+  <div class="bar"><span class="pill" id="u4-step">第 1 題／共 7 題</span><span class="pill" id="u4-score">⭐ 0 分</span></div>
+  <div id="u4-area">
+    <div class="sent"><div class="s" id="u4-s"></div><div class="stl" id="u4-tl"></div><button class="btn ghost say" id="u4-say" onclick="U4.say()">🔊 再聽一次</button></div>
+    <div class="opts opts4" id="u4-opts"></div>
+    <div class="fb" id="u4-fb"></div>
+    <button class="btn next" id="u4-next" onclick="U4.next()">下一題 →</button>
+  </div>
+  <div class="done-box" id="u4-done"><div class="tw">多謝你幫忙收成！</div><span class="tl">To-siā lí pang-bâng siu-sîng!</span><p id="u4-msg"></p><button class="btn" onclick="U4.start()">再玩一次</button></div>
   <details><summary>🔊 聽發音</summary><div class="words" id="u4-words"></div></details>
 </section>
 
@@ -276,37 +282,50 @@ const U3 = {
   }
 };
 
-/* ---------- 單元四：打地鼠 ---------- */
+/* ---------- 單元四：句子填空（音檔：教育部臺灣台語常用詞辭典） ---------- */
 const U4 = {
-  good: [['割','kuah'],['曝乾','pha̍k-kuann'],['拍','phah'],['謝天','siā-thinn'],['多謝','to-siā']],
-  bad: [['落種','lo̍h-tsíng'],['芟菜','sing tshài'],['雨鞋','hōo-ê'],['沃水','ak-tsuí']],
-  init() { $('u4-holes').innerHTML = Array.from({ length: 9 }, (_, i) => `<button class="hole" data-i="${i}"><div class="mole"></div></button>`).join('');
-    [...$('u4-holes').children].forEach(h => h.onclick = () => this.hit(h)); },
-  start() {
-    clearInterval(this.t); clearTimeout(this.p); this.score = 0; this.left = 30; this.run = true;
-    $('u4-end').innerHTML = ''; $('u4-go').textContent = '重新開始'; this.paint(); this.pop();
-    this.t = setInterval(() => { this.left--; this.paint(); if (this.left <= 0) this.stop(); }, 1000);
+  words: { 割: ['kuah', 8156], 曝乾: ['pha̍k-kuann', 12785], 拍: ['phah', 3956], 收成: ['siu-sîng', 2478], 麻油: ['muâ-iû', 8109], 芳: ['phang', 4427], 多謝: ['to-siā', 2415] },
+  qs: [
+    ['麻仔熟矣，咱來', '割', '麻！', 'Muâ-á si̍k--ah, lán lâi kuah-muâ!'],
+    ['割落來的麻仔，愛先', '曝乾', '。', 'Kuah--lo̍h-lâi ê muâ-á, ài sing pha̍k-kuann.'],
+    ['麻仔曝乾矣，咱來', '拍', '麻！', 'Muâ-á pha̍k-kuann--ah, lán lâi phah-muâ!'],
+    ['今年的烏麻仔', '收成', '真好！', 'Kin-nî ê oo-muâ-á siu-sîng tsin hó!'],
+    ['烏麻仔會當做', '麻油', '。', 'Oo-muâ-á ē-tàng tsò muâ-iû.'],
+    ['麻油雞真', '芳', '！', 'Muâ-iû-ke tsin phang!'],
+    ['收成了，咱共土地公講', '多謝', '！', 'Siu-sîng liáu, lán kā Thóo-tī-kong kóng to-siā!'],
+  ],
+  start() { this.q = shuffle(this.qs); this.n = 0; this.score = 0; $('u4-done').classList.remove('on'); $('u4-area').style.display = ''; this.show(); },
+  show() {
+    const [pre, ans, post] = this.q[this.n]; this.tried = false; this.solved = false;
+    const others = shuffle(Object.keys(this.words).filter(w => w !== ans)).slice(0, 3);
+    this.opts = shuffle([ans, ...others]);
+    $('u4-step').textContent = `第 ${this.n + 1} 題／共 ${this.q.length} 題`; $('u4-score').textContent = `⭐ ${this.score} 分`;
+    $('u4-s').innerHTML = `${pre}<span class="blank">　</span>${post}`; $('u4-tl').textContent = '';
+    $('u4-fb').innerHTML = ''; $('u4-next').classList.remove('on'); $('u4-say').classList.remove('on');
+    $('u4-opts').innerHTML = this.opts.map((w, i) => `<button class="opt" data-i="${i}"><span class="tw">${w}</span><span class="tl">${this.words[w][0]}</span></button>`).join('');
+    [...$('u4-opts').children].forEach(b => b.onclick = () => this.pick(b));
   },
-  paint() { $('u4-time').textContent = `⏱ ${this.left} 秒`; $('u4-score').textContent = `⭐ ${this.score} 分`; },
-  pop() {
-    if (!this.run) return;
-    const holes = [...$('u4-holes').children].filter(h => !h.classList.contains('up'));
-    const h = holes[Math.floor(Math.random() * holes.length)];
-    const isGood = Math.random() < 0.6; const list = isGood ? this.good : this.bad; const w = list[Math.floor(Math.random() * list.length)];
-    h.dataset.good = isGood ? '1' : '0'; h.className = 'hole up'; h.querySelector('.mole').innerHTML = twHTML(w[0], w[1]);
-    setTimeout(() => h.classList.remove('up'), 1500);
-    this.p = setTimeout(() => this.pop(), 750);
+  say() { const w = this.q[this.n][1]; if (this.audio) this.audio.pause(); this.audio = new Audio(MOE_MP3(this.words[w][1])); this.audio.play().catch(() => {}); },
+  pick(b) {
+    if (this.solved) return;
+    const w = this.opts[+b.dataset.i]; const [pre, ans, post, tl] = this.q[this.n];
+    if (w === ans) {
+      this.solved = true; b.classList.add('ok'); if (!this.tried) this.score++;
+      $('u4-score').textContent = `⭐ ${this.score} 分`;
+      $('u4-s').innerHTML = `${pre}<span class="blank">${ans}</span>${post}`; $('u4-tl').textContent = tl;
+      $('u4-fb').innerHTML = twHTML('著！', 'Tio̍h!'); $('u4-say').classList.add('on');
+      $('u4-next').classList.add('on'); $('u4-next').textContent = this.n + 1 < this.q.length ? '下一題 →' : '看結果 →';
+      this.say();
+    } else {
+      this.tried = true; b.classList.remove('no'); void b.offsetWidth; b.classList.add('no');
+      $('u4-fb').innerHTML = twHTML('閣試看覓！', 'Koh tshì khuànn-māi!');
+    }
   },
-  hit(h) {
-    if (!this.run || !h.classList.contains('up')) return;
-    const g = h.dataset.good === '1'; this.score += g ? 1 : -1; this.paint();
-    h.classList.add(g ? 'hit-ok' : 'hit-no'); setTimeout(() => h.classList.remove('up', 'hit-ok', 'hit-no'), 250);
-  },
-  stop() {
-    this.run = false; clearInterval(this.t); clearTimeout(this.p);
-    [...$('u4-holes').children].forEach(h => h.classList.remove('up'));
-    $('u4-end').innerHTML = `${this.score} 分！` + (this.score >= 10 ? twHTML('多謝你幫忙收成！', 'To-siā lí pang-bâng siu-sîng!') : twHTML('閣試看覓！', 'Koh tshì khuànn-māi!'));
-    $('u4-go').textContent = '再玩一次';
+  next() {
+    this.n++; if (this.n < this.q.length) return this.show();
+    if (this.audio) this.audio.pause();
+    $('u4-area').style.display = 'none'; $('u4-step').textContent = '完成！';
+    $('u4-msg').textContent = `${this.q.length} 題第一次就答對 ${this.score} 題！`; $('u4-done').classList.add('on');
   }
 };
 
@@ -316,15 +335,15 @@ function route() {
   $('home').classList.toggle('on', !g);
   $('top').style.display = g ? 'none' : '';
   document.querySelectorAll('.game').forEach(s => s.classList.toggle('on', s.id === g));
-  if (g !== 'u4' && U4.run) U4.stop();
+  if (g !== 'u4' && U4.audio) U4.audio.pause();
   if (g !== 'u1' && U1.audio) U1.audio.pause();
-  if (g === 'u1') U1.start(); if (g === 'u2') U2.start(); if (g === 'u3') U3.start();
+  if (g === 'u1') U1.start(); if (g === 'u2') U2.start(); if (g === 'u3') U3.start(); if (g === 'u4') U4.start();
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
 wordLinks('u1-words', U1.pairs); wordLinks('u2-words', U2.steps); wordLinks('u3-words', [['杜蚓仔','tōo-kún-á'],['塗','thôo'],['友善','iú-siān'],['蟲','thâng'],['菜股','tshài-kóo'],['溝','kau']]);
-wordLinks('u4-words', U4.good);
-U1.start(); U2.start(); U3.start(); U4.init(); route();
+wordLinks('u4-words', Object.entries(U4.words).map(([w, v]) => [w, v[0]]));
+U1.start(); U2.start(); U3.start(); U4.start(); route();
 </script>
 </body>
 </html>
