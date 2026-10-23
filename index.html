@@ -47,6 +47,20 @@ button{font:inherit;cursor:pointer;border:none;border-radius:14px}
 .card .emo{font-size:38px;line-height:1}
 .card .zh{font-size:17px;margin-top:6px;font-weight:700}
 .card .tw{font-size:20px}
+/* 聽音選字 */
+.play{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px auto 16px;width:100%;max-width:360px;padding:18px 10px;border-radius:999px;background:var(--u1);color:#fff;font-size:22px;font-weight:800;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.play:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.play.playing{background:#A8784A}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{background:var(--u1l);border:3px solid #E2CBAE;border-radius:16px;padding:14px 8px;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.opt .tw{font-size:28px}
+.opt .zh{font-size:15px;color:var(--grey);margin-top:4px}
+.opt .tl{display:none}
+.opt.ok{border-color:var(--good);background:#EAF6EA}.opt.ok .tl{display:block}
+.opt.no{border-color:var(--bad);background:#FBEAEA;animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.next{display:none;margin:14px auto 0}
+.next.on{display:block}
 /* 排序 */
 .slots{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;padding:10px;border:3px dashed var(--u2);border-radius:14px;background:var(--u2l);margin-bottom:12px}
 .slots .chip{background:#fff}
@@ -99,7 +113,7 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
 </header>
 <section id="home">
   <div class="units">
-    <a class="unit" href="#u1" style="background:var(--u1)"><div><b>單元一　認識胡麻</b><span>裝備翻翻樂</span><small>臺語和圖片配成一對</small></div></a>
+    <a class="unit" href="#u1" style="background:var(--u1)"><div><b>單元一　認識胡麻</b><span>聽聽看，選選看</span><small>聽臺語，選出正確的詞</small></div></a>
     <a class="unit" href="#u2" style="background:var(--u2)"><div><b>單元二　胡麻成長</b><span>胡麻長大排排看</span><small>從種子排到結莢</small></div></a>
     <a class="unit" href="#u3" style="background:var(--u3)"><div><b>單元三　友善土地</b><span>友善土地分一分</span><small>是土地的好朋友嗎？</small></div></a>
     <a class="unit" href="#u4" style="background:var(--u4)"><div><b>單元四　豐收感恩</b><span>收成臺語打地鼠</span><small>30 秒挑戰</small></div></a>
@@ -110,11 +124,16 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
 
 <section class="game" id="u1">
   <a class="back" href="#">← 回首頁</a>
-  <h2 style="color:var(--u1)">單元一　小農夫裝備翻翻樂</h2>
-  <p class="how">翻開兩張牌，把<b>臺語</b>和<b>圖片</b>配成一對！</p>
-  <div class="bar"><span class="pill" id="u1-step">翻了 0 次</span><button class="btn ghost" onclick="U1.start()">重新開始</button></div>
-  <div class="grid" id="u1-grid"></div>
-  <div class="done-box" id="u1-done"><div class="tw">你真𠢕！</div><span class="tl">Lí tsin gâu!</span><p id="u1-msg"></p></div>
+  <h2 style="color:var(--u1)">單元一　聽聽看，選選看</h2>
+  <p class="how">按下 🔊 聽臺語，從下面選出<b>正確的詞</b>。聽不清楚可以再聽一次！</p>
+  <div class="bar"><span class="pill" id="u1-step">第 1 題／共 8 題</span><span class="pill" id="u1-score">⭐ 0 分</span></div>
+  <div id="u1-play-area">
+    <button class="play" id="u1-play" onclick="U1.play()">🔊 聽臺語</button>
+    <div class="opts" id="u1-opts"></div>
+    <div class="fb" id="u1-fb"></div>
+    <button class="btn next" id="u1-next" onclick="U1.next()">下一題 →</button>
+  </div>
+  <div class="done-box" id="u1-done"><div class="tw">你真𠢕！</div><span class="tl">Lí tsin gâu!</span><p id="u1-msg"></p><button class="btn" onclick="U1.start()">再玩一次</button></div>
   <details><summary>🔊 聽發音</summary><div class="words" id="u1-words"></div></details>
 </section>
 
@@ -152,7 +171,7 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
 </section>
 
 </main>
-<footer>臺南市善化區陽明國民小學　三年級校訂課程「胡厝胡麻情」<br>發音連結：教育部《臺灣台語常用詞辭典》</footer>
+<footer>臺南市善化區陽明國民小學　三年級校訂課程「胡厝胡麻情」<br>發音連結與音檔：教育部《臺灣台語常用詞辭典》（創用CC 姓名標示－禁止改作 3.0 臺灣）</footer>
 
 <script>
 // 辭典沒有收成詞條的詞，改連到收錄它的詞條或用例（2026/10 查核）
@@ -163,27 +182,54 @@ const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { c
 const twHTML = (hj, tl) => `<span class="tw">${hj}</span><span class="tl">${tl}</span>`;
 function wordLinks(el, list) { $(el).innerHTML = list.map(([hj, tl]) => `<a href="${DICT(hj)}" target="_blank" rel="noopener">🔊 ${hj} <span class="tl" style="display:inline">${tl}</span></a>`).join(''); }
 
-/* ---------- 單元一：翻牌配對 ---------- */
+/* ---------- 單元一：聽音選字（音檔：教育部臺灣台語常用詞辭典，CC BY-ND 3.0 TW） ---------- */
+const MOE_MP3 = id => `https://sutian.moe.edu.tw/media/senn/mp3/imtong/subak/${Math.floor(id / 1000)}/${id}.mp3`;
 const U1 = {
-  pairs: [['瓜笠仔','kue-le̍h-á','👒','斗笠'],['雨鞋','hōo-ê','🥾','雨鞋'],['烏麻仔','oo-muâ-á','⚫','黑芝麻'],
-          ['白露','pe̍h-lōo','💧','節氣：白露'],['杜蚓仔','tōo-kún-á','🪱','蚯蚓'],['漩桶','suān-tháng','🪣','澆水的水桶']],
+  pairs: [['瓜笠仔','kue-le̍h-á','斗笠',9984],['雨鞋','hōo-ê','雨鞋',25139],['黜仔','thuh-á','鋤頭',12457],['耙仔','pê-á','耙子',6494],
+          ['漩桶','suān-tháng','澆水的水桶',10628],['菜股','tshài-kóo','種菜的土畦',27387],['溝','kau','菜股中間的溝',9639],
+          ['杜蚓仔','tōo-kún-á','蚯蚓',3245],['烏麻仔','oo-muâ-á','黑芝麻',27620],['白露','pe̍h-lōo','節氣：白露',20354]],
+  N: 8,
   start() {
-    this.open = []; this.flips = 0; this.got = 0; this.lock = false;
-    $('u1-step').textContent = '翻了 0 次'; $('u1-done').classList.remove('on');
-    const cards = shuffle(this.pairs.flatMap((p, i) => [{ k: i, html: twHTML(p[0], p[1]) }, { k: i, html: `<span class="emo">${p[2]}</span><span class="zh">${p[3]}</span>` }]));
-    $('u1-grid').innerHTML = cards.map((c, i) => `<button class="card" data-k="${c.k}" aria-label="翻牌"><div class="in"><div class="f">🌱</div><div class="b">${c.html}</div></div></button>`).join('');
-    [...$('u1-grid').children].forEach(b => b.onclick = () => this.flip(b));
+    this.q = shuffle(this.pairs).slice(0, this.N); this.n = 0; this.score = 0;
+    $('u1-done').classList.remove('on'); $('u1-play-area').style.display = '';
+    this.show(false);
   },
-  flip(b) {
-    if (this.lock || b.classList.contains('flip') || b.classList.contains('done')) return;
-    b.classList.add('flip'); this.open.push(b);
-    if (this.open.length < 2) return;
-    this.flips++; $('u1-step').textContent = `翻了 ${this.flips} 次`;
-    const [a, c] = this.open; this.open = [];
-    if (a.dataset.k === c.dataset.k) {
-      a.classList.add('done'); c.classList.add('done'); this.got++;
-      if (this.got === this.pairs.length) { $('u1-msg').textContent = `你用 ${this.flips} 次就全部配對成功了！`; $('u1-done').classList.add('on'); }
-    } else { this.lock = true; setTimeout(() => { a.classList.remove('flip'); c.classList.remove('flip'); this.lock = false; }, 900); }
+  show(autoplay) {
+    const ans = this.q[this.n]; this.tried = false; this.solved = false;
+    const others = shuffle(this.pairs.filter(p => p !== ans)).slice(0, 3);
+    this.opts = shuffle([ans, ...others]);
+    $('u1-step').textContent = `第 ${this.n + 1} 題／共 ${this.N} 題`; $('u1-score').textContent = `⭐ ${this.score} 分`;
+    $('u1-fb').innerHTML = ''; $('u1-next').classList.remove('on');
+    $('u1-opts').innerHTML = this.opts.map((p, i) => `<button class="opt" data-i="${i}"><span class="tw">${p[0]}</span><span class="tl">${p[1]}</span><span class="zh">${p[2]}</span></button>`).join('');
+    [...$('u1-opts').children].forEach(b => b.onclick = () => this.pick(b));
+    if (this.audio) this.audio.pause();
+    this.audio = new Audio(MOE_MP3(ans[3])); this.audio.preload = 'auto';
+    this.audio.onplay = () => $('u1-play').classList.add('playing');
+    this.audio.onended = this.audio.onpause = () => $('u1-play').classList.remove('playing');
+    this.audio.onerror = () => { $('u1-fb').innerHTML = '音檔載入失敗，請檢查網路後再按一次 🔊'; };
+    if (autoplay) this.play();
+  },
+  play() { if (!this.audio) return; this.audio.currentTime = 0; this.audio.play().catch(() => { $('u1-fb').innerHTML = '請再按一次 🔊 聽臺語'; }); },
+  pick(b) {
+    if (this.solved) return;
+    const p = this.opts[+b.dataset.i]; const ans = this.q[this.n];
+    if (p === ans) {
+      this.solved = true; b.classList.add('ok'); if (!this.tried) this.score++;
+      $('u1-score').textContent = `⭐ ${this.score} 分`;
+      $('u1-fb').innerHTML = twHTML('著！', 'Tio̍h!'); $('u1-next').classList.add('on');
+      $('u1-next').textContent = this.n + 1 < this.N ? '下一題 →' : '看結果 →';
+    } else {
+      this.tried = true; b.classList.remove('no'); void b.offsetWidth; b.classList.add('no');
+      $('u1-fb').innerHTML = twHTML('閣試看覓！', 'Koh tshì khuànn-māi!') + '<div>再聽一次 🔊 看看</div>';
+    }
+  },
+  next() {
+    this.n++;
+    if (this.n < this.N) return this.show(true);
+    if (this.audio) this.audio.pause();
+    $('u1-play-area').style.display = 'none';
+    $('u1-step').textContent = '完成！';
+    $('u1-msg').textContent = `${this.N} 題第一次就答對 ${this.score} 題！`; $('u1-done').classList.add('on');
   }
 };
 
@@ -271,6 +317,7 @@ function route() {
   $('top').style.display = g ? 'none' : '';
   document.querySelectorAll('.game').forEach(s => s.classList.toggle('on', s.id === g));
   if (g !== 'u4' && U4.run) U4.stop();
+  if (g !== 'u1' && U1.audio) U1.audio.pause();
   if (g === 'u1') U1.start(); if (g === 'u2') U2.start(); if (g === 'u3') U3.start();
   window.scrollTo(0, 0);
 }
