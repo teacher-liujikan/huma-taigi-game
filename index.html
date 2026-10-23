@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>胡厝胡麻情 臺語小遊戲</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* 字體同教育部《臺灣台語常用詞辭典》：豆腐烏（臺羅）＋ Noto Sans TC（漢字） */
+@font-face{font-family:"Tauhu Oo";src:local("Tauhu Oo"),local("TauhuOo20.05-Regular"),url("TauhuOo20.05-Regular.woff2") format("woff2");font-display:swap}
+:root{
+  --paper:#FFFBF2; --ink:#2B2B2B; --grey:#7A7068;
+  --u1:#8B5A2B; --u1l:#F6ECDD; --u2:#4E8A3E; --u2l:#E8F3E3;
+  --u3:#2F7F86; --u3l:#E0F0F1; --u4:#C2662D; --u4l:#FBEADF;
+  --tai:#9C3D2E; --good:#3E8E41; --bad:#C0392B;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Tauhu Oo","Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;-webkit-tap-highlight-color:transparent}
+header{padding:18px 16px 8px;text-align:center}
+header h1{margin:0;font-size:26px;color:var(--u1);letter-spacing:2px}
+header p{margin:4px 0 0;color:var(--grey);font-size:15px}
+main{max-width:760px;margin:0 auto;padding:6px 16px 40px}
+.game{display:none;background:#fff;border-radius:18px;padding:18px 16px 22px;box-shadow:0 2px 10px rgba(80,50,20,.08)}
+.game.on{display:block}
+.game h2{margin:0 0 4px;font-size:22px}
+.how{margin:0 0 14px;color:var(--grey);font-size:16px;line-height:1.6}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px;flex-wrap:wrap}
+.pill{background:var(--paper);border-radius:999px;padding:6px 14px;font-size:16px;font-weight:700}
+button{font:inherit;cursor:pointer;border:none;border-radius:14px}
+.btn{background:var(--ink);color:#fff;padding:10px 18px;font-size:17px;font-weight:700}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid #ddd}
+.tw{font-weight:800;color:var(--tai)}
+.tl{display:block;font-size:14px;color:var(--grey);font-weight:400;margin-top:2px}
+/* 翻牌 */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:520px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{aspect-ratio:3/4;perspective:600px;background:none;padding:0}
+.card .in{position:relative;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
+.card.flip .in,.card.done .in{transform:rotateY(180deg)}
+.card .f,.card .b{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;text-align:center}
+.card .f{background:var(--u1);color:#fff;font-size:30px}
+.card .b{background:var(--u1l);transform:rotateY(180deg);border:3px solid var(--u1)}
+.card.done .b{border-color:var(--good);background:#EAF6EA}
+.card .emo{font-size:38px;line-height:1}
+.card .zh{font-size:17px;margin-top:6px;font-weight:700}
+.card .tw{font-size:20px}
+/* 排序 */
+.slots{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;padding:10px;border:3px dashed var(--u2);border-radius:14px;background:var(--u2l);margin-bottom:12px}
+.slots .chip{background:#fff}
+.pool{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:var(--u2l);border:2px solid var(--u2);border-radius:14px;padding:8px 12px;font-size:18px;text-align:center;min-width:96px}
+.chip .n{display:inline-block;background:var(--u2);color:#fff;border-radius:999px;width:24px;height:24px;line-height:24px;font-size:14px;margin-right:4px}
+.chip.ok{border-color:var(--good);background:#EAF6EA}
+.chip.no{border-color:var(--bad);background:#FBEAEA}
+/* 分類 */
+.sortcard{font-size:24px;font-weight:800;text-align:center;padding:26px 14px;border-radius:18px;background:var(--u3l);border:3px solid var(--u3);margin:6px 0 16px;min-height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two button{padding:18px 8px;font-size:21px;font-weight:800;color:#fff}
+.yes{background:var(--good)} .no-b{background:var(--bad)}
+.fb{min-height:52px;text-align:center;font-size:18px;margin-top:12px;line-height:1.5}
+/* 打地鼠 */
+.prompt{background:var(--u4l);border-left:8px solid var(--u4);padding:10px 14px;border-radius:10px;font-size:18px;margin-bottom:12px}
+.holes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.hole{aspect-ratio:1.2/1;border-radius:50% 50% 18px 18px/40% 40% 18px 18px;background:#8E6B47;position:relative;overflow:hidden;padding:0}
+.hole .mole{position:absolute;left:8%;right:8%;bottom:-100%;height:82%;border-radius:40px 40px 10px 10px;background:#F3D9B5;border:3px solid #6E4F31;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:bottom .15s;font-size:19px;font-weight:800;color:var(--tai)}
+.hole.up .mole{bottom:4%}
+.hole.hit-ok .mole{background:#CDEBC9}
+.hole.hit-no .mole{background:#F6C9C3}
+.big{font-size:22px;text-align:center;margin:14px 0 6px;font-weight:800}
+/* 聽發音 */
+details{margin-top:18px;background:var(--paper);border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;font-weight:700;font-size:16px}
+.words{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.words a{text-decoration:none;background:#fff;border:1px solid #e3d6c6;border-radius:10px;padding:6px 10px;color:var(--ink);font-size:16px}
+.done-box{display:none;text-align:center;padding:16px;margin-top:14px;border-radius:16px;background:#EAF6EA}
+.done-box.on{display:block}
+.done-box .tw{font-size:26px}
+#home{display:none;max-width:760px;margin:0 auto;padding:6px 16px 30px}
+#home.on{display:block}
+.units{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.units{grid-template-columns:1fr}}
+.unit{display:flex;gap:14px;align-items:center;text-decoration:none;color:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .1s}
+.unit:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.unit b{display:block;font-size:15px;opacity:.9;font-weight:400}
+.unit span{display:block;font-size:22px;font-weight:800;margin-top:2px}
+.unit small{display:block;font-size:14px;opacity:.9;margin-top:4px}
+.back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink);background:#fff;border:2px solid #e3d6c6;border-radius:999px;padding:8px 16px;font-size:17px;font-weight:700;margin:4px 0 12px}
+.tip{text-align:center;color:var(--grey);font-size:15px;margin:16px 0 0}
+footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;line-height:1.7}
+</style>
+</head>
+<body>
+<header id="top">
+  <h1>胡厝胡麻情　臺語小遊戲</h1>
+  <p>玩遊戲，學臺語！按 🔊 可以聽教育部辭典的發音</p>
+</header>
+<section id="home">
+  <div class="units">
+    <a class="unit" href="#u1" style="background:var(--u1)"><div><b>單元一　認識胡麻</b><span>裝備翻翻樂</span><small>臺語和圖片配成一對</small></div></a>
+    <a class="unit" href="#u2" style="background:var(--u2)"><div><b>單元二　胡麻成長</b><span>胡麻長大排排看</span><small>從種子排到結莢</small></div></a>
+    <a class="unit" href="#u3" style="background:var(--u3)"><div><b>單元三　友善土地</b><span>友善土地分一分</span><small>是土地的好朋友嗎？</small></div></a>
+    <a class="unit" href="#u4" style="background:var(--u4)"><div><b>單元四　豐收感恩</b><span>收成臺語打地鼠</span><small>30 秒挑戰</small></div></a>
+  </div>
+  <p class="tip">學完哪個單元，就玩哪個單元的遊戲！</p>
+</section>
+<main>
+
+<section class="game" id="u1">
+  <a class="back" href="#">← 回首頁</a>
+  <h2 style="color:var(--u1)">單元一　小農夫裝備翻翻樂</h2>
+  <p class="how">翻開兩張牌，把<b>臺語</b>和<b>圖片</b>配成一對！</p>
+  <div class="bar"><span class="pill" id="u1-step">翻了 0 次</span><button class="btn ghost" onclick="U1.start()">重新開始</button></div>
+  <div class="grid" id="u1-grid"></div>
+  <div class="done-box" id="u1-done"><div class="tw">你真𠢕！</div><span class="tl">Lí tsin gâu!</span><p id="u1-msg"></p></div>
+  <details><summary>🔊 聽發音</summary><div class="words" id="u1-words"></div></details>
+</section>
+
+<section class="game" id="u2">
+  <a class="back" href="#">← 回首頁</a>
+  <h2 style="color:var(--u2)">單元二　胡麻長大排排看</h2>
+  <p class="how">胡麻是怎麼長大的？照<b>順序</b>點下面的卡片，排好後按「對答案」。點上面已排好的卡片可以拿回來。</p>
+  <div class="slots" id="u2-slots"></div>
+  <div class="pool" id="u2-pool"></div>
+  <div class="bar" style="margin-top:14px"><button class="btn" onclick="U2.check()">對答案</button><button class="btn ghost" onclick="U2.start()">重新開始</button></div>
+  <div class="fb" id="u2-fb"></div>
+  <details><summary>🔊 聽發音</summary><div class="words" id="u2-words"></div></details>
+</section>
+
+<section class="game" id="u3">
+  <a class="back" href="#">← 回首頁</a>
+  <h2 style="color:var(--u3)">單元三　友善土地分一分</h2>
+  <p class="how">這樣做，對土地<b>友善</b>還是會<b>傷害</b>土地？</p>
+  <div class="bar"><span class="pill" id="u3-count">第 1 題</span><span class="pill" id="u3-score">答對 0 題</span></div>
+  <div class="sortcard" id="u3-card"></div>
+  <div class="two"><button class="yes" onclick="U3.pick(true)">友善 ✔</button><button class="no-b" onclick="U3.pick(false)">傷害 ✘</button></div>
+  <div class="fb" id="u3-fb"></div>
+  <div class="done-box" id="u3-done"><div class="tw">你是土地的好朋友！</div><p id="u3-msg"></p><button class="btn" onclick="U3.start()">再玩一次</button></div>
+  <details><summary>🔊 聽發音</summary><div class="words" id="u3-words"></div></details>
+</section>
+
+<section class="game" id="u4">
+  <a class="back" href="#">← 回首頁</a>
+  <h2 style="color:var(--u4)">單元四　收成臺語打地鼠</h2>
+  <div class="prompt">打出<b>收成和感恩</b>時會說的臺語！打對加 1 分，打錯扣 1 分。</div>
+  <div class="bar"><span class="pill" id="u4-time">⏱ 30 秒</span><span class="pill" id="u4-score">⭐ 0 分</span><button class="btn" id="u4-go" onclick="U4.start()">開始</button></div>
+  <div class="holes" id="u4-holes"></div>
+  <div class="big" id="u4-end"></div>
+  <details><summary>🔊 聽發音</summary><div class="words" id="u4-words"></div></details>
+</section>
+
+</main>
+<footer>臺南市善化區陽明國民小學　三年級校訂課程「胡厝胡麻情」<br>發音連結：教育部《臺灣台語常用詞辭典》</footer>
+
+<script>
+// 辭典沒有收成詞條的詞，改連到收錄它的詞條或用例（2026/10 查核）
+const DICT_ALT = { '落種': ['hua_ku', '播種'], '芟菜': ['tai_su', '芟'], '謝天': ['hua_ku', '謝天'] };
+const DICT = w => { const [lui, q] = DICT_ALT[w] || ['tai_su', w]; return 'https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=' + lui + '&tsha=' + encodeURIComponent(q); };
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const twHTML = (hj, tl) => `<span class="tw">${hj}</span><span class="tl">${tl}</span>`;
+function wordLinks(el, list) { $(el).innerHTML = list.map(([hj, tl]) => `<a href="${DICT(hj)}" target="_blank" rel="noopener">🔊 ${hj} <span class="tl" style="display:inline">${tl}</span></a>`).join(''); }
+
+/* ---------- 單元一：翻牌配對 ---------- */
+const U1 = {
+  pairs: [['瓜笠仔','kue-le̍h-á','👒','斗笠'],['雨鞋','hōo-ê','🥾','雨鞋'],['烏麻仔','oo-muâ-á','⚫','黑芝麻'],
+          ['白露','pe̍h-lōo','💧','節氣：白露'],['杜蚓仔','tōo-kún-á','🪱','蚯蚓'],['漩桶','suān-tháng','🪣','澆水的水桶']],
+  start() {
+    this.open = []; this.flips = 0; this.got = 0; this.lock = false;
+    $('u1-step').textContent = '翻了 0 次'; $('u1-done').classList.remove('on');
+    const cards = shuffle(this.pairs.flatMap((p, i) => [{ k: i, html: twHTML(p[0], p[1]) }, { k: i, html: `<span class="emo">${p[2]}</span><span class="zh">${p[3]}</span>` }]));
+    $('u1-grid').innerHTML = cards.map((c, i) => `<button class="card" data-k="${c.k}" aria-label="翻牌"><div class="in"><div class="f">🌱</div><div class="b">${c.html}</div></div></button>`).join('');
+    [...$('u1-grid').children].forEach(b => b.onclick = () => this.flip(b));
+  },
+  flip(b) {
+    if (this.lock || b.classList.contains('flip') || b.classList.contains('done')) return;
+    b.classList.add('flip'); this.open.push(b);
+    if (this.open.length < 2) return;
+    this.flips++; $('u1-step').textContent = `翻了 ${this.flips} 次`;
+    const [a, c] = this.open; this.open = [];
+    if (a.dataset.k === c.dataset.k) {
+      a.classList.add('done'); c.classList.add('done'); this.got++;
+      if (this.got === this.pairs.length) { $('u1-msg').textContent = `你用 ${this.flips} 次就全部配對成功了！`; $('u1-done').classList.add('on'); }
+    } else { this.lock = true; setTimeout(() => { a.classList.remove('flip'); c.classList.remove('flip'); this.lock = false; }, 900); }
+  }
+};
+
+/* ---------- 單元二：排序 ---------- */
+const U2 = {
+  steps: [['種子','tsíng-tsí','⚫'],['落種','lo̍h-tsíng','🕳️'],['沃水','ak-tsuí','💦'],['栽','tsai','🌱'],
+          ['芟菜','sing tshài','✂️'],['開花','khui-hue','🌸'],['莢','ngeh','🫛']],
+  start() { this.seq = []; this.pool = shuffle(this.steps.map((s, i) => i)); $('u2-fb').innerHTML = ''; this.draw(); },
+  chip(i, extra = '') { const s = this.steps[i]; return `<button class="chip ${extra}" data-i="${i}">${s[2]} ${twHTML(s[0], s[1])}</button>`; },
+  draw(mark) {
+    $('u2-slots').innerHTML = this.seq.length ? this.seq.map((i, n) => this.chip(i, mark ? (i === n ? 'ok' : 'no') : '').replace('">', `"><span class="n">${n + 1}</span>`)).join('') : '<span style="color:var(--grey);font-size:16px;padding:8px">把卡片按照順序點到這裡 ⬇</span>';
+    $('u2-pool').innerHTML = this.pool.map(i => this.chip(i)).join('');
+    [...$('u2-pool').children].forEach(b => b.onclick = () => { const i = +b.dataset.i; this.pool = this.pool.filter(x => x !== i); this.seq.push(i); $('u2-fb').innerHTML = ''; this.draw(); });
+    [...$('u2-slots').querySelectorAll('.chip')].forEach(b => b.onclick = () => { const i = +b.dataset.i; this.seq = this.seq.filter(x => x !== i); this.pool.push(i); $('u2-fb').innerHTML = ''; this.draw(); });
+  },
+  check() {
+    if (this.seq.length < this.steps.length) { $('u2-fb').innerHTML = '還有卡片沒排喔！'; return; }
+    const ok = this.seq.filter((i, n) => i === n).length; this.draw(true);
+    $('u2-fb').innerHTML = ok === this.steps.length
+      ? `${twHTML('著！你真𠢕！', 'Tio̍h! Lí tsin gâu!')}<br>胡麻從種子一路長到結出麻莢，你全部排對了！`
+      : `排對 ${ok} 張，紅色的再想一想。${twHTML('閣試看覓！', 'Koh tshì khuànn-māi!')}`;
+  }
+};
+
+/* ---------- 單元三：分類 ---------- */
+const U3 = {
+  items: [['掛黃色黏蟲板抓蟲', true, '不用農藥也能抓到害蟲。'], ['用手把蟲抓走', true, '辛苦一點，土地和胡麻都健康。'],
+          ['讓杜蚓仔住在塗裡', true, '杜蚓仔會幫忙鬆土，是土地的好朋友。'], ['踏溝仔，毋通踏菜股', true, '菜股不被踩硬，胡麻的根才好呼吸。'],
+          ['把垃圾撿起來帶走', true, '田裡乾乾淨淨，小生物住得安心。'], ['噴很多很多農藥', false, '農藥會傷害土裡的小生物。'],
+          ['用力踩在菜股上', false, '土被踩硬，水和空氣就進不去了。'], ['把垃圾丟在田裡', false, '垃圾會污染土地。']],
+  start() { this.q = shuffle(this.items); this.n = 0; this.ok = 0; $('u3-done').classList.remove('on'); $('u3-card').parentElement.querySelector('.two').style.display = ''; this.show(); },
+  show() { $('u3-card').style.display = ''; $('u3-card').textContent = this.q[this.n][0]; $('u3-count').textContent = `第 ${this.n + 1} 題／共 ${this.q.length} 題`; $('u3-score').textContent = `答對 ${this.ok} 題`; },
+  pick(v) {
+    if (this.busy) return; this.busy = true;
+    const [t, ans, why] = this.q[this.n]; const right = v === ans; if (right) this.ok++;
+    $('u3-fb').innerHTML = (right ? twHTML('著！', 'Tio̍h!') : `<span class="tw" style="color:var(--bad)">閣試看覓！</span><span class="tl">Koh tshì khuànn-māi!</span><span class="tl">這是${ans ? '友善' : '傷害'}土地的行為</span>`) + `<div>${why}</div>`;
+    $('u3-score').textContent = `答對 ${this.ok} 題`;
+    setTimeout(() => {
+      this.busy = false; $('u3-fb').innerHTML = ''; this.n++;
+      if (this.n < this.q.length) return this.show();
+      $('u3-card').style.display = 'none'; $('u3-card').parentElement.querySelector('.two').style.display = 'none';
+      $('u3-msg').textContent = `8 題答對 ${this.ok} 題！`; $('u3-done').classList.add('on');
+    }, 1800);
+  }
+};
+
+/* ---------- 單元四：打地鼠 ---------- */
+const U4 = {
+  good: [['割','kuah'],['曝乾','pha̍k-kuann'],['拍','phah'],['謝天','siā-thinn'],['多謝','to-siā']],
+  bad: [['落種','lo̍h-tsíng'],['芟菜','sing tshài'],['雨鞋','hōo-ê'],['沃水','ak-tsuí']],
+  init() { $('u4-holes').innerHTML = Array.from({ length: 9 }, (_, i) => `<button class="hole" data-i="${i}"><div class="mole"></div></button>`).join('');
+    [...$('u4-holes').children].forEach(h => h.onclick = () => this.hit(h)); },
+  start() {
+    clearInterval(this.t); clearTimeout(this.p); this.score = 0; this.left = 30; this.run = true;
+    $('u4-end').innerHTML = ''; $('u4-go').textContent = '重新開始'; this.paint(); this.pop();
+    this.t = setInterval(() => { this.left--; this.paint(); if (this.left <= 0) this.stop(); }, 1000);
+  },
+  paint() { $('u4-time').textContent = `⏱ ${this.left} 秒`; $('u4-score').textContent = `⭐ ${this.score} 分`; },
+  pop() {
+    if (!this.run) return;
+    const holes = [...$('u4-holes').children].filter(h => !h.classList.contains('up'));
+    const h = holes[Math.floor(Math.random() * holes.length)];
+    const isGood = Math.random() < 0.6; const list = isGood ? this.good : this.bad; const w = list[Math.floor(Math.random() * list.length)];
+    h.dataset.good = isGood ? '1' : '0'; h.className = 'hole up'; h.querySelector('.mole').innerHTML = twHTML(w[0], w[1]);
+    setTimeout(() => h.classList.remove('up'), 1500);
+    this.p = setTimeout(() => this.pop(), 750);
+  },
+  hit(h) {
+    if (!this.run || !h.classList.contains('up')) return;
+    const g = h.dataset.good === '1'; this.score += g ? 1 : -1; this.paint();
+    h.classList.add(g ? 'hit-ok' : 'hit-no'); setTimeout(() => h.classList.remove('up', 'hit-ok', 'hit-no'), 250);
+  },
+  stop() {
+    this.run = false; clearInterval(this.t); clearTimeout(this.p);
+    [...$('u4-holes').children].forEach(h => h.classList.remove('up'));
+    $('u4-end').innerHTML = `${this.score} 分！` + (this.score >= 10 ? twHTML('多謝你幫忙收成！', 'To-siā lí pang-bâng siu-sîng!') : twHTML('閣試看覓！', 'Koh tshì khuànn-māi!'));
+    $('u4-go').textContent = '再玩一次';
+  }
+};
+
+/* ---------- 切換單元 ---------- */
+function route() {
+  const id = location.hash.slice(1); const g = ['u1', 'u2', 'u3', 'u4'].includes(id) ? id : null;
+  $('home').classList.toggle('on', !g);
+  $('top').style.display = g ? 'none' : '';
+  document.querySelectorAll('.game').forEach(s => s.classList.toggle('on', s.id === g));
+  if (g !== 'u4' && U4.run) U4.stop();
+  if (g === 'u1') U1.start(); if (g === 'u2') U2.start(); if (g === 'u3') U3.start();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+wordLinks('u1-words', U1.pairs); wordLinks('u2-words', U2.steps); wordLinks('u3-words', [['杜蚓仔','tōo-kún-á'],['塗','thôo'],['友善','iú-siān'],['蟲','thâng'],['菜股','tshài-kóo'],['溝','kau']]);
+wordLinks('u4-words', U4.good);
+U1.start(); U2.start(); U3.start(); U4.init(); route();
+</script>
+</body>
+</html>
