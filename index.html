@@ -105,6 +105,25 @@ summary{cursor:pointer;font-weight:700;font-size:16px}
 .unit small{display:block;font-size:14px;opacity:.9;margin-top:4px}
 .back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink);background:#fff;border:2px solid #e3d6c6;border-radius:999px;padding:8px 16px;font-size:17px;font-weight:700;margin:4px 0 12px}
 .tip{text-align:center;color:var(--grey);font-size:15px;margin:16px 0 0}
+/* 臺語詞庫 */
+.unit.wide{grid-column:1/-1}
+.wgroup{margin:0 0 18px}
+.wgroup h3{margin:0 0 8px;font-size:17px;display:flex;align-items:center;gap:8px}
+.wgroup h3 .tag{color:#fff;border-radius:999px;padding:2px 10px;font-size:14px}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.wcard{position:relative;display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:#fff;border:2px solid #EADFCF;border-radius:16px;padding:12px 40px 12px 14px;min-height:96px;box-shadow:0 2px 0 rgba(0,0,0,.06)}
+.wcard:active{transform:translateY(2px)}
+.wcard.playing{border-color:var(--tai);background:#FFF4EA}
+.wcard .hj{font-size:24px;font-weight:800;color:var(--tai);line-height:1.3}
+.wcard .lo{font-size:16px;color:var(--ink);margin-top:2px}
+.wcard .zh{font-size:14px;color:var(--grey);margin-top:4px}
+.wcard .spk{font-size:15px;margin-top:6px;color:var(--grey)}
+.wcard .note{font-size:12px;color:var(--grey);margin-top:2px}
+.wcard.noaudio .spk{color:#B8AFA6}
+.ext{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:10px;background:var(--paper);border:1px solid #E3D6C6;color:var(--ink);text-decoration:none;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}
+.ext:hover{background:#F3E6D3}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:15px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:.92}
 footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;line-height:1.7}
 </style>
 </head>
@@ -119,6 +138,7 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
     <a class="unit" href="#u2" style="background:var(--u2)"><div><b>單元二　胡麻成長</b><span>胡麻長大排排看</span><small>從種子排到結莢</small></div></a>
     <a class="unit" href="#u3" style="background:var(--u3)"><div><b>單元三　友善土地</b><span>友善土地分一分</span><small>是土地的好朋友嗎？</small></div></a>
     <a class="unit" href="#u4" style="background:var(--u4)"><div><b>單元四　豐收感恩</b><span>聽句子，填填看</span><small>聽臺語句子，選出空格的詞</small></div></a>
+    <a class="unit wide" href="#words" style="background:var(--tai)"><div><b>手冊裡的臺語詞</b><span>臺語詞庫：點一點，聽發音</span><small>學習單 1～9-2 的臺語詞，點詞卡就能聽，按 ↗ 看辭典詳細介紹</small></div></a>
   </div>
   <p class="tip">學完哪個單元，就玩哪個單元的遊戲！</p>
 </section>
@@ -178,7 +198,15 @@ footer{text-align:center;color:var(--grey);font-size:13px;padding:0 16px 24px;li
   <details><summary>🔊 聽發音</summary><div class="words" id="u4-words"></div></details>
 </section>
 
+<section class="game" id="words">
+  <a class="back" href="#">← 回首頁</a>
+  <h2 style="color:var(--tai)">臺語詞庫：點一點，聽發音</h2>
+  <p class="how">點一下<b>詞卡</b>就能聽教育部辭典的發音，看臺羅拼音學怎麼唸。想知道更多，就按右上角的 <b>↗</b> 到辭典看詳細介紹！</p>
+  <div id="wbox"></div>
+</section>
+
 </main>
+<div class="toast" id="toast"></div>
 <footer>臺南市善化區陽明國民小學　三年級校訂課程「胡厝胡麻情」<br>發音連結與音檔：教育部《臺灣台語常用詞辭典》（創用CC 姓名標示－禁止改作 3.0 臺灣）</footer>
 
 <script>
@@ -346,21 +374,62 @@ const U4 = {
   }
 };
 
+
+/* ---------- 臺語詞庫（依手冊學習單整理；音檔與詞目：教育部臺灣台語常用詞辭典） ---------- */
+const SU = id => `https://sutian.moe.edu.tw/zh-hant/su/${id}/`;
+const WORDS = [
+  ['學習單 1', '白露到了，種胡麻囉！', 'u1', [['白露','pe̍h-lōo','節氣名',20354],['烏麻仔','oo-muâ-á','黑芝麻',27620],['你真𠢕','lí tsin gâu','你好厲害',13471,'錄音為「𠢕」單字']]],
+  ['學習單 2', '小小農夫準備下田', 'u1', [['瓜笠仔','kue-le̍h-á','斗笠',9984],['雨鞋','hōo-ê','雨鞋',25139],['黜仔','thuh-á','鋤頭',12457],['耙仔','pê-á','耙子',6494],['漩桶','suān-tháng','澆水的水桶',10628],['菜股','tshài-kóo','種作物的土畦',27387],['溝','kau','菜股中間的溝',9639],['杜蚓仔','tōo-kún-á','蚯蚓',3245]]],
+  ['學習單 3', '胡麻點播', 'u2', [['種子','tsíng-tsí','種子',10697],['落種','lo̍h-tsíng','播種',0,'辭典沒有這個詞條，按 ↗ 看用例'],['沃水','ak-tsuí','澆水',3292]]],
+  ['學習單 4', '芟菜的智慧', 'u2', [['芟菜','sing tshài','拔掉太密的小苗',4423,'錄音為「芟」單字'],['栽','tsai','幼苗',6087]]],
+  ['學習單 5', '胡麻身體大發現', 'u2', [['開花','khui-hue','花開了',9174],['葉仔','hio̍h-á','葉子',9979],['根','kin','根',6085],['莢','ngeh','果莢',7811]]],
+  ['學習單 6・7', '友善土地', 'u3', [['塗','thôo','土',9356],['友善','iú-siān','友善',23564],['蟲','thâng','蟲',12594]]],
+  ['學習單 8', '割麻、曝麻、拍麻', 'u4', [['割','kuah','割麻的「割」',8156],['曝乾','pha̍k-kuann','曬乾',12785],['拍','phah','拍麻的「拍」：拍打',3956]]],
+  ['學習單 9', '過磅與謝天', 'u4', [['謝天','siā-thinn','感謝上天',0,'辭典沒有這個詞條，按 ↗ 看用例'],['多謝','to-siā','謝謝',2415],['食果子拜樹頭；食米飯拜田頭。','Tsia̍h kué-tsí pài tshiū-thâu; tsia̍h bí-pn̄g pài tshân-thâu.','吃水果要感謝種樹的人：飲水思源',27068]]],
+  ['學習單 9-2', '胡麻的滋味', 'u4', [['麻油','muâ-iû','胡麻油',8109],['麻油雞','muâ-iû-ke','麻油雞',19073],['芳','phang','香',4427]]],
+];
+const W = {
+  audio: null, cur: null,
+  toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(this.tt); this.tt = setTimeout(() => t.classList.remove('on'), 2600); },
+  stop() { if (this.audio) this.audio.pause(); if (this.cur) this.cur.classList.remove('playing'); this.cur = null; },
+  play(btn, id) {
+    if (!id) return this.toast('這個詞辭典沒有單獨的錄音，請按 ↗ 到辭典看用例');
+    this.stop(); this.cur = btn; btn.classList.add('playing');
+    const a = this.audio = new Audio(MOE_MP3(id));
+    a.onended = () => btn.classList.remove('playing');
+    a.onerror = () => { btn.classList.remove('playing'); this.toast('音檔暫時播不出來，請按 ↗ 到辭典聽'); };
+    a.play().catch(() => { btn.classList.remove('playing'); this.toast('音檔暫時播不出來，請按 ↗ 到辭典聽'); });
+  },
+  render() {
+    $('wbox').innerHTML = WORDS.map(([ws, title, u, list]) => `<div class="wgroup"><h3><span class="tag" style="background:var(--${u})">${ws}</span>${title}</h3><div class="wlist">` +
+      list.map(([hj, lo, zh, id, note]) => `<div class="wcard${id ? '' : ' noaudio'}" role="button" tabindex="0" data-id="${id}">` +
+        `<span class="hj">${hj}</span><span class="lo">${lo}</span><span class="zh">${zh}</span>` +
+        `<span class="spk">${id ? '🔊 點我聽' : '🔇 沒有單獨錄音'}</span>${note ? `<span class="note">${note}</span>` : ''}` +
+        `<a class="ext" href="${id ? SU(id) : DICT(hj)}" target="_blank" rel="noopener" title="到教育部辭典看詳細介紹" aria-label="到教育部辭典看「${hj}」">↗</a></div>`).join('') + '</div></div>').join('');
+    $('wbox').querySelectorAll('.wcard').forEach(c => {
+      const go = e => { if (e.target.closest('.ext')) return; W.play(c, +c.dataset.id); };
+      c.addEventListener('click', go);
+      c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+    });
+  }
+};
+
 /* ---------- 切換單元 ---------- */
 function route() {
-  const id = location.hash.slice(1); const g = ['u1', 'u2', 'u3', 'u4'].includes(id) ? id : null;
+  const id = location.hash.slice(1); const g = ['u1', 'u2', 'u3', 'u4', 'words'].includes(id) ? id : null;
   $('home').classList.toggle('on', !g);
   $('top').style.display = g ? 'none' : '';
   document.querySelectorAll('.game').forEach(s => s.classList.toggle('on', s.id === g));
   if (g !== 'u4' && U4.audio) U4.audio.pause();
   if (g !== 'u1' && U1.audio) U1.audio.pause();
+  if (g !== 'words') W.stop();
   if (g === 'u1') U1.start(); if (g === 'u2') U2.start(); if (g === 'u3') U3.start(); if (g === 'u4') U4.start();
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
 wordLinks('u1-words', U1.pairs); wordLinks('u2-words', U2.steps); wordLinks('u3-words', [['杜蚓仔','tōo-kún-á'],['塗','thôo'],['友善','iú-siān'],['蟲','thâng'],['菜股','tshài-kóo'],['溝','kau']]);
 wordLinks('u4-words', [['烏麻仔','oo-muâ-á'],['烏麻油','oo-muâ-iû'],['收成','siu-sîng'],['多謝','to-siā'],['熟','si̍k'],['割','kuah'],['曝','pha̍k'],['土地公','Thóo-tī-kong'],['芳','phang']]);
-U1.start(); U2.start(); U3.start(); U4.start(); route();
+W.render(); U1.start(); U2.start(); U3.start(); U4.start(); route();
 </script>
 </body>
 </html>
